@@ -4,6 +4,8 @@ Created on Fri Oct 19 11:05:45 2018
 
 @author: Cavin
 """
+# A program to predict the NHL matches using the Poisson Distribution and Skellam Distribution 
+
 # Sources
 ## https://www.hockey-reference.com/leagues/NHL_2019_games.html
 ## https://github.com/dashee87/blogScripts/blob/master/Jupyter/2017-06-04-predicting-football-results-with-statistical-modelling.ipynb
