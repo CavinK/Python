@@ -4,7 +4,7 @@ Created on Sun Nov 11 00:54:02 2018
 
 @author: Julia and Cavin 
 """
-
+ 
 # 0. 텍스트 파일 로드 
 with open('C://data/ordo.txt', 'r') as myfile:
     txt = myfile.read().replace('\n', '')
