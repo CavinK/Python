@@ -4,7 +4,7 @@ Created on Fri Oct 19 11:05:45 2018
 
 @author: Cavin
 """
-# A program to predict the NHL matches using the Poisson Distribution and Skellam Distribution 
+# A program to predict the NHL matches using the Poisson Distribution and the Skellam Distribution 
 
 # Sources
 ## https://www.hockey-reference.com/leagues/NHL_2019_games.html
