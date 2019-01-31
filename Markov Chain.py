@@ -6,6 +6,11 @@ Created on Sun Nov 11 00:54:02 2018
 """
 
 # Short-sentence summeriser with Markov Chain 
+## 1. English 
+## 2. Korean 
+## 3. Japanese 
+
+
 
 # pip install PyPDF2 
 ## PyPDF info: https://www.geeksforgeeks.org/working-with-pdf-files-in-python/
@@ -217,7 +222,6 @@ board.values()
 ## Multiple Perceptron 
 
 ## Markov Chain 
-### https://towardsdatascience.com/simulating-text-with-markov-chains-in-python-1a27e6d13fc6
 token = tokenized
 chain = []
 for i in range(1,len(token)):
