@@ -2,7 +2,7 @@
 """
 Created on Sun Nov 11 00:54:02 2018
 
-@author: Julia and Cavin 
+@author: Cavin 
 """
 
 # Short-sentence summeriser with Markov Chain 
