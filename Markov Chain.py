@@ -7,8 +7,8 @@ Created on Sun Nov 11 00:54:02 2018
 
 # Short-sentence summeriser with Markov Chain 
 ## 1. English 
-## 2. Korean 
-## 3. Japanese 
+## 2. Japanese 
+## 3. Korean
 
 
 
@@ -258,7 +258,128 @@ Ordo-liberalism is fundamentally one of the context of free markets . Its theore
 ##############################################################################
 
 
-# 2. Korean NLP 
+# 2. Japanese 
+
+txt = '''
+日本において英文学とは一体どういうものだったのか。これから英文学はどうあるべきなのか。
+こうした素朴だが決して放置すべきではない重要な疑問に真正面から取り組んだ先行研究はそ
+れほど多くないが、近年になって、正木恒夫『植民地幻想』（1995 年）、宮崎芳三『太平洋戦争と英
+文学者』（1999 年）、山口誠『英語講座の誕生』（2002 年）といった研究が現れてきた。これらの研
+究は、〈脱亜入欧〉や〈近代の超克〉といったスローガンに象徴される、西欧を意識した日本の国
+家的戦略の中において、英文学なるものがどのような機能を担っていたのかを批判的に分析したと
+いう点において、高く評価できるだろう。ただし、残念ながら、これらの研究は、英文学の批判の
+後にあってしかるべき、英文学の新たな可能性については本格的に議論してはいないのである。
+本論文は、以上紹介した先行研究が扱わなかった事例を取り上げると同時に、〈脱亜入欧〉や〈近
+代の超克〉というプロジェクトの中で構築された英文学が、こうしたプロジェクトを揺るがしかね
+ないような要素を含み込んでいたことを明らかにすることで、英文学の豊かさ、その可能性を示す
+ことを試みている。本論のタイトルが「英文学の構築」ではなく「英文学の脱構築」である所以で
+ある。
+'''
+print(txt)
+txt = txt.replace('\n','')
+txt_split = txt.split('。')
+
+## http://taku910.github.io/mecab/
+## Binary package for MS-Windows
+## 環境変数 -> PATH -> C:\Program Files (x86)\MeCab\bin
+from MeCab import *
+t = Tagger()
+print(t.parse(txt))
+type(t.parse(txt))
+
+div = t.parse(txt).split('\n')
+div[0].split('\t')[1]
+lst = []
+for i in div:
+    if len(i.split('\t')) == 2:
+        lst.append(i.split('\t'))
+
+import numpy as np
+lst_np = np.array(lst)
+token = list(lst_np[:,0])
+
+lst[0][1][0:lst[0][1].find(',')]
+
+noun = [lst[i] for i in range(0,len(lst)) if lst[i][1][0:lst[i][1].find(',')] == '名詞'] ### 명사 추출 
+
+## 불용어 처리 
+import numpy as np
+noun_np = np.array(noun)
+nouns = list(noun_np[:,0])
+stopword = ['.',',',')','(','の','もの','そ','年','的','よう','これら','者','中','さ','を','こと']
+jp = [eachword for eachword in nouns if eachword not in stopword]
+
+## 빈도 수 
+np.unique(jp, return_counts=True) ### 각 단어들의 빈도 수
+## Container 
+from collections import *
+Counter(jp) ### container 이용해서 빈도 수 파악 
+ct = Counter(jp)
+ct.most_common(10) ### 상위 10개 추출 
+
+## 문장 추출 
+topword = np.array(ct.most_common(10))
+topword = topword[:,0]
+
+txt_split = txt.split('。')
+sent_jp = []
+for i in txt_split:
+    for j in topword:
+        if j in i:
+            sent_jp.append(i)
+set(sent_jp)
+
+
+
+## Markov Chain 
+### https://towardsdatascience.com/simulating-text-with-markov-chains-in-python-1a27e6d13fc6
+chain = []
+for i in range(1,len(token)):
+    chain.append((token[i-1], token[i]))
+
+chain_dict = {}
+for i, j in chain:
+    if i in chain_dict.keys():
+        chain_dict[i].append(j)
+    else:
+        chain_dict[i] = [j]
+
+import numpy as np
+topwords = list(np.array(ct.most_common(10))[:,0])
+first = np.random.choice(topwords)
+mark = [first]
+number = 80
+
+for i in range(number):
+    mark.append(np.random.choice(chain_dict[mark[-1]]))
+''.join(mark) 
+
+# Result 
+'''
+日本において英文学の新たな疑問に議論してしかるべきな可能性を批判の豊かされたの構築」であるべきな要素を意識した。こうしたプロジェクトを試み
+'''
+
+
+
+## NaiveBayes(10-18-2018)
+topword = np.array(ct.most_common(10))
+len(topword)
+
+data = {}
+for i in range(0,len(topword)):
+    data[topword[i,0]] = topword[i,1]    
+
+
+
+import MeCab as mc
+mc.DictionaryInfo_swigregister()
+
+
+
+##############################################################################
+
+
+# 3. Korean NLP 
 # 1) Twitter()  
 import konlpy
 from konlpy.tag import Twitter 
@@ -459,123 +580,3 @@ from ckonlpy.tag import Twitter
 twitter = Twitter()
 twitter.add_dictionary('마이닝','Noun') ### 단어 추가! 
 collections.Counter(twitter.nouns(txt)) 
-
-
-##############################################################################
-
-
-# 3. Japanese 
-
-txt = '''
-日本において英文学とは一体どういうものだったのか。これから英文学はどうあるべきなのか。
-こうした素朴だが決して放置すべきではない重要な疑問に真正面から取り組んだ先行研究はそ
-れほど多くないが、近年になって、正木恒夫『植民地幻想』（1995 年）、宮崎芳三『太平洋戦争と英
-文学者』（1999 年）、山口誠『英語講座の誕生』（2002 年）といった研究が現れてきた。これらの研
-究は、〈脱亜入欧〉や〈近代の超克〉といったスローガンに象徴される、西欧を意識した日本の国
-家的戦略の中において、英文学なるものがどのような機能を担っていたのかを批判的に分析したと
-いう点において、高く評価できるだろう。ただし、残念ながら、これらの研究は、英文学の批判の
-後にあってしかるべき、英文学の新たな可能性については本格的に議論してはいないのである。
-本論文は、以上紹介した先行研究が扱わなかった事例を取り上げると同時に、〈脱亜入欧〉や〈近
-代の超克〉というプロジェクトの中で構築された英文学が、こうしたプロジェクトを揺るがしかね
-ないような要素を含み込んでいたことを明らかにすることで、英文学の豊かさ、その可能性を示す
-ことを試みている。本論のタイトルが「英文学の構築」ではなく「英文学の脱構築」である所以で
-ある。
-'''
-print(txt)
-txt = txt.replace('\n','')
-txt_split = txt.split('。')
-
-## http://taku910.github.io/mecab/
-## Binary package for MS-Windows
-## 環境変数 -> PATH -> C:\Program Files (x86)\MeCab\bin
-from MeCab import *
-t = Tagger()
-print(t.parse(txt))
-type(t.parse(txt))
-
-div = t.parse(txt).split('\n')
-div[0].split('\t')[1]
-lst = []
-for i in div:
-    if len(i.split('\t')) == 2:
-        lst.append(i.split('\t'))
-
-import numpy as np
-lst_np = np.array(lst)
-token = list(lst_np[:,0])
-
-lst[0][1][0:lst[0][1].find(',')]
-
-noun = [lst[i] for i in range(0,len(lst)) if lst[i][1][0:lst[i][1].find(',')] == '名詞'] ### 명사 추출 
-
-## 불용어 처리 
-import numpy as np
-noun_np = np.array(noun)
-nouns = list(noun_np[:,0])
-stopword = ['.',',',')','(','の','もの','そ','年','的','よう','これら','者','中','さ','を','こと']
-jp = [eachword for eachword in nouns if eachword not in stopword]
-
-## 빈도 수 
-np.unique(jp, return_counts=True) ### 각 단어들의 빈도 수
-## Container 
-from collections import *
-Counter(jp) ### container 이용해서 빈도 수 파악 
-ct = Counter(jp)
-ct.most_common(10) ### 상위 10개 추출 
-
-## 문장 추출 
-topword = np.array(ct.most_common(10))
-topword = topword[:,0]
-
-txt_split = txt.split('。')
-sent_jp = []
-for i in txt_split:
-    for j in topword:
-        if j in i:
-            sent_jp.append(i)
-set(sent_jp)
-
-
-
-## Markov Chain 
-### https://towardsdatascience.com/simulating-text-with-markov-chains-in-python-1a27e6d13fc6
-chain = []
-for i in range(1,len(token)):
-    chain.append((token[i-1], token[i]))
-
-chain_dict = {}
-for i, j in chain:
-    if i in chain_dict.keys():
-        chain_dict[i].append(j)
-    else:
-        chain_dict[i] = [j]
-
-import numpy as np
-topwords = list(np.array(ct.most_common(10))[:,0])
-first = np.random.choice(topwords)
-mark = [first]
-number = 80
-
-for i in range(number):
-    mark.append(np.random.choice(chain_dict[mark[-1]]))
-''.join(mark) 
-
-# Result 
-'''
-日本において英文学の新たな疑問に議論してしかるべきな可能性を批判の豊かされたの構築」であるべきな要素を意識した。こうしたプロジェクトを試み
-'''
-
-
-
-## NaiveBayes(10-18-2018)
-topword = np.array(ct.most_common(10))
-len(topword)
-
-data = {}
-for i in range(0,len(topword)):
-    data[topword[i,0]] = topword[i,1]    
-
-
-
-import MeCab as mc
-mc.DictionaryInfo_swigregister()
